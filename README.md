@@ -17,7 +17,7 @@ Cada jogador mantém sua própria grade (10x10) e seus navios. Os peers descobre
 |-------|-----------|-------|------------|
 | Descoberta de jogadores | UDP | 5000 | Broadcast inicial e notificações |
 | Comunicação direta | TCP | 5001 | Respostas para tiros e intercâmbio da lista de jogadores |
-| Ciclo de ataque automático | UDP | 5000 | A cada 10 segundos um tiro é enviado |
+| Ciclo de ataque automático | UDP | 5000 | Interface que conecta com o usuário  |
 
 **Navios disponíveis:**
 
@@ -33,11 +33,10 @@ Cada jogador mantém sua própria grade (10x10) e seus navios. Os peers descobre
 ## 📁 Estrutura do Projeto
 
 ```
-batalha_p2p/
+batalha_naval_project/
 │
-├── client_udp_broadcast.py        # Interface gráfica + lógica principal do jogo
-├── server_udp.py                  # Servidor UDP (descoberta + mensagens de jogo)
-├── server_tcp.py                  # Servidor TCP (respostas de hit/destroyed/listas)
+├── jogo.py        # Interface gráfica + lógica principal do jogo
+├── p2p_node.py                  # Responsável pelos servidores UDP e TCP (descoberta + mensagens de jogo)
 └── grid.py                        # Responsável pelas funções de criação do grid e posicionamento dos navios
 ```
 
@@ -63,10 +62,8 @@ pip install -r requirements.txt
 
 ### 3. Execute o cliente
 ```bash
-python clietn_udp_broadcast.py
+python jogo.py
 ```
-
-O arquivo do client.py
 
 
 ### 4. Certifique-se de que todos os jogadores estão na **mesma rede local**
@@ -76,19 +73,18 @@ O arquivo do client.py
 ## 🕹 Como Jogar
 
 - A interface exibe sua grade.
-- O posicionamento dos navios pode ser automático ou manual (dependendo da implementação).
-- O jogo envia tiros automaticamente a cada 10 segundos.
+- O posicionamento dos navios pode ser automático ou manual.
 - Ao acertar um tiro → é enviado **TCP: "hit"**.
 - Quando um navio é destruído → é enviado **TCP: "destroyed"**.
 - Se todos os navios forem destruídos → é enviado **UDP: "lost"**.
-- Para sair → pressione **Q** ou feche a janela → enviará **"saindo"** aos outros.
+- Para sair → feche a janela → enviará **"saindo"** aos outros.
 
 ---
 
 ## 🏁 Finalização e Score
 
 Ao sair, o cliente exibe:
-- Quantos jogadores você acertou
+- QJogadores únicos que você atingiu
 - Quantas vezes foi atingido
 - **Score final = jogadores acertados − vezes atingido**
 
