@@ -35,10 +35,10 @@ Cada jogador mantém sua própria grade (10x10) e seus navios. Os peers descobre
 ```
 batalha_p2p/
 │
-├── client.py        # Interface gráfica + lógica principal do jogo
-├── udp_server.py    # Servidor UDP (descoberta + mensagens de jogo)
-├── tcp_server.py    # Servidor TCP (respostas de hit/destroyed/listas)
-└── grid.py          # Representação da grid e posicionamento dos navios
+├── client_udp_broadcast.py        # Interface gráfica + lógica principal do jogo
+├── server_udp.py                  # Servidor UDP (descoberta + mensagens de jogo)
+├── server_tcp.py                  # Servidor TCP (respostas de hit/destroyed/listas)
+└── grid.py                        # Responsável pelas funções de criação do grid e posicionamento dos navios
 ```
 
 ---
@@ -63,8 +63,11 @@ pip install -r requirements.txt
 
 ### 3. Execute o cliente
 ```bash
-python client.py
+python clietn_udp_broadcast.py
 ```
+
+O arquivo do client.py
+
 
 ### 4. Certifique-se de que todos os jogadores estão na **mesma rede local**
 

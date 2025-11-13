@@ -1,19 +1,16 @@
 # client.py
-# Start UDP and TCP servers, UI (pygame), periodic shots every 10s, handle join/leave/shot/hit/destroyed/lost/saindo
+# Start UDP and TCP servers, UI (pygame), periodic shots every 10s,
+# handle join/leave/shot/hit/destroyed/lost/saindo
 # Run: python client.py
 
 import threading
 import socket
 import time
-import json
-import sys
 import random
 import pygame
 from grid import Grid
 from udp_server import UDPServer, udp_broadcast, udp_send_to
 from tcp_server import TCPServer, tcp_send
-
-# try to import pygame; if not available, fallback to text-only
 
 LOCAL_UDP_PORT = 5000
 LOCAL_TCP_PORT = 5001
@@ -33,7 +30,17 @@ class PeerGame:
 
         # grid
         self.grid = Grid()
-        self.grid.place_ships_random()
+
+        # Pergunta ao jogador se prefere manual ou automático
+        try:
+            choice = input('Deseja posicionar os barcos manualmente? (S/N): ').strip().lower()
+        except Exception:
+            # em contextos sem stdin, cai para automático
+            choice = 'n'
+        if choice == 's':
+            self.grid.place_ships_manual()
+        else:
+            self.grid.place_ships_random()
 
         # network
         self.udp_server = UDPServer(self.handle_udp)
@@ -252,7 +259,6 @@ class PeerGame:
             print("================")
 
 
-# Pygame UI
 def run_pygame_ui(game: PeerGame):
     pygame.init()
     size = (600, 500)

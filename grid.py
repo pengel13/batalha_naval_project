@@ -1,8 +1,6 @@
-# grid.py
-# Helper: grid 10x10, navios, verificar hits, estados
-
 import random
 from typing import List, Tuple, Dict
+
 
 class Ship:
     def __init__(self, name: str, size: int, positions: List[Tuple[int, int]]):
@@ -23,6 +21,7 @@ class Ship:
 
     def is_destroyed(self) -> bool:
         return len(self.hits) >= self.size
+
 
 class Grid:
     WIDTH = 10
@@ -74,7 +73,9 @@ class Grid:
         self.total_ship_cells += size
         return True
 
-    def manual_place_ship(self, name: str, size: int, x: int, y: int, is_horizontal: bool) -> bool:
+    def manual_place_ship(
+        self, name: str, size: int, x: int, y: int, is_horizontal: bool
+    ) -> bool:
         coords = (
             [(x + i, y) for i in range(size)]
             if is_horizontal
@@ -123,3 +124,99 @@ class Grid:
         for sid, ship in self.ships.items():
             d[ship.name] = ship.positions
         return d
+
+    def place_ships_manual(self):
+        # Interactive manual placement of ships via terminal input.
+        #        The player must provide initial and final coordinates for each ship (x1,y1) -> (x2,y2).
+        #       Coordinates must form a straight line (horizontal or vertical) and match the ship size.
+
+        self.ships = {}
+        self.cells = [[0] * self.WIDTH for _ in range(self.HEIGHT)]
+        self._next_ship_id = 1
+        self.total_ship_cells = 0
+
+        ship_defs = [
+            ("porta_avioes", 5, "Porta-aviões"),
+            (
+                "bombardeiro",
+                4, "Bombardeiro"
+            ),
+            (
+                "submarino",
+                3, "Submarino"
+            ),
+            (
+                "lancha",
+                2, "Lancha Militar"
+            ),
+        ]
+
+        print(
+            "\nPosicione suas embarcações manualmente (coordenadas x e y entre 0 e 9).\n"
+        )
+
+        for internal_name, size, display_name in ship_defs:
+            placed = False
+            while not placed:
+                print(f"➡️  {display_name} (tamanho {size})")
+                try:
+                    raw = input(
+                        "Digite x1 y1 x2 y2 separados por espaço (ou 'c' para cancelar): "
+                    ).strip()
+                    if raw.lower() == "c":
+                        print(
+                            "Cancelado pelo usuário. Reiniciando posicionamento deste navio."
+                        )
+                        continue
+                    parts = raw.split()
+                    if len(parts) != 4:
+                        print("  ❌ Entrada inválida — informe 4 números: x1 y1 x2 y2.")
+                        continue
+                    x1, y1, x2, y2 = map(int, parts)
+                except ValueError:
+                    print("  ❌ Entrada inválida. Use números inteiros entre 0 e 9.")
+                    continue
+
+                # bounds check
+                coords_ok = all(0 <= v < self.WIDTH for v in (x1, y1, x2, y2))
+                if not coords_ok:
+                    print("  ❌ Coordenadas fora dos limites (0-9). Tente novamente.")
+                    continue
+
+                # must be straight line
+                if x1 != x2 and y1 != y2:
+                    print(
+                        "  ❌ O barco deve estar em linha reta (horizontal ou vertical). Tente novamente."
+                    )
+                    continue
+
+                # determine orientation and length
+                if x1 == x2:
+                    is_horizontal = False
+                    length = abs(y2 - y1) + 1
+                    x = x1
+                    y = min(y1, y2)
+                else:
+                    is_horizontal = True
+                    length = abs(x2 - x1) + 1
+                    x = min(x1, x2)
+                    y = y1
+
+                if length != size:
+                    print(
+                        f"  ❌ Comprimento informado ({length}) não corresponde ao tamanho do {display_name} ({size}). Tente novamente."
+                    )
+                    continue
+
+                # attempt to place using existing manual_place_ship validation
+                ok = self.manual_place_ship(internal_name, size, x, y, is_horizontal)
+                if not ok:
+                    print(
+                        "  ❌ Posição inválida ou colisão com outro barco. Tente outra posição."
+                    )
+                    continue
+
+                placed = True
+                print(f"  ✅ {display_name} posicionado com sucesso.\n")
+
+        print("Todos os navios posicionados com sucesso!\n")
