@@ -1,7 +1,6 @@
 import socket
 import threading
 import time
-import queue
 
 
 class P2PNode:
@@ -43,7 +42,7 @@ class P2PNode:
                 if ip_limpo:
                     ips_recebidos.append(ip_limpo)
             return ips_recebidos
-        except:
+        except Exception:
             return []
 
     def _enviar_tcp(self, mensagem, ip):
