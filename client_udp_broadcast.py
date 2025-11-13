@@ -9,8 +9,8 @@ import time
 import random
 import pygame
 from grid import Grid
-from udp_server import UDPServer, udp_broadcast, udp_send_to
-from tcp_server import TCPServer, tcp_send
+from server_udp import UDPServer, udp_broadcast, udp_send_to
+from server_tcp import TCPServer, tcp_send
 
 LOCAL_UDP_PORT = 5000
 LOCAL_TCP_PORT = 5001
