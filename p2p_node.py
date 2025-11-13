@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+import queue
 
 
 class P2PNode:
@@ -14,7 +15,6 @@ class P2PNode:
         self.lock = threading.Lock()
         self.running = True
         self.MEU_IP = self._get_meu_ip_local()
-
         self.callback_queue = callback_queue
 
         with self.lock:
@@ -131,7 +131,7 @@ class P2PNode:
                                 self.callback_queue.put(
                                     ("tiro_recebido", ip_origem, x, y)
                                 )
-                            except:
+                            except Exception:
                                 pass
 
                         elif mensagem == "lost":
@@ -173,8 +173,16 @@ class P2PNode:
                             ("lista_participantes", novos_encontrados)
                         )
 
-                elif mensagem in ["hit", "destroyed"]:
-                    self.callback_queue.put(("resultado_tiro", ip_origem, mensagem))
+                elif ":" in mensagem:
+                    try:
+                        partes = mensagem.split(":")
+                        if len(partes) == 3:
+                            resultado, x, y = partes[0], int(partes[1]), int(partes[2])
+                            self.callback_queue.put(
+                                ("resultado_tiro", ip_origem, resultado, x, y)
+                            )
+                    except ValueError:
+                        pass
 
         except socket.error:
             pass
